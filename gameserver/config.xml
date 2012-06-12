@@ -1,0 +1,4 @@
+<!-- game server configuration file -->
+<configuration>
+    <port>10508</port>
+</configuration>
