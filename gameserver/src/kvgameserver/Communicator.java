@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.Socket;
+import java.util.Set;
 
 import kvgameserver.service.Configuration;
 
@@ -13,7 +14,8 @@ public class Communicator implements Runnable {
 	private Socket socket = null;
 	private BufferedReader br = null;
 	private OutputStream os = null;
-	private String games = null; 
+	private String games = null;
+	private String connectionOwner = null;
 
 	public Communicator(Socket socket) {
 		this.socket = socket;
@@ -43,17 +45,30 @@ public class Communicator implements Runnable {
 				switch (command) {
 				case "conn" :
 					this.connectPlayer(parts[1].trim());
+					break;
+				case "opponent" :
+					this.offerGame(parts[1]);
+					break;
 				}
 			}
 		} catch (Exception e) { e.printStackTrace(); }
 	}
 
+	private void offerGame(String opponentName) throws IOException {
+		Socket opponentSocket = DataKeeper.players.get(opponentName);
+		OutputStream oos = opponentSocket.getOutputStream();
+		String offer = "OFFER:" + connectionOwner;
+		oos.write(offer.getBytes());
+	}
+
 	private void connectPlayer(String playerName) throws IOException {
 		if (playerName != null) {
-			DataKeeper.players.add(playerName);
+			this.connectionOwner = playerName;
+			DataKeeper.players.put(playerName, socket);
 			this.print(playerName + " connected.");
 			StringBuilder playersOnline = new StringBuilder();
-			for (String name : DataKeeper.players) {
+			Set<String> keys = DataKeeper.players.keySet();
+			for (String name : keys) {
 				if (!name.equals(playerName)) {
 					playersOnline.append(name).append(" ");
 				}

@@ -1,7 +1,9 @@
 package kvgameserver;
 
-import java.util.HashSet;
+import java.net.Socket;
+import java.util.Hashtable;
 
 public class DataKeeper {
-	public static HashSet<String> players = new HashSet<String>();
+	public static Hashtable<String, Socket> players =
+			new Hashtable<String, Socket>();
 }
