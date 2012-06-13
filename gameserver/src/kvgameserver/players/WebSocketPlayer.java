@@ -10,7 +10,7 @@ public class WebSocketPlayer extends Player implements WebSocket.OnTextMessage {
 
 	private Connection connection = null;
 	private String lastMessage = null;
-	private boolean newMessage = false;
+	private Object newMessage = new Object();
 
 	@Override
 	public void send(String message) throws IOException {
@@ -19,12 +19,14 @@ public class WebSocketPlayer extends Player implements WebSocket.OnTextMessage {
 
 	@Override
 	public String receive() throws IOException {
-		String answer = "null";
-		if (newMessage) {
-			answer = lastMessage;
-			newMessage = false;
+		try {
+			synchronized(newMessage) {
+				newMessage.wait();
+			}
+		} catch (InterruptedException e) {
+			e.printStackTrace();
 		}
-		return answer;
+		return lastMessage;
 	}
 
 	@Override
@@ -44,7 +46,9 @@ public class WebSocketPlayer extends Player implements WebSocket.OnTextMessage {
 	@Override
 	public void onMessage(String message) {
 		WebSocketPlayer.this.lastMessage = message;
-		newMessage = true;
+		synchronized(newMessage) {
+			newMessage.notify();
+		}
 	}
 
 }

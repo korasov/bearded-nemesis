@@ -1,10 +1,6 @@
 package kvgameserver;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.net.Socket;
 import java.util.Set;
 
 import kvgameserver.players.Player;
@@ -20,23 +16,18 @@ public class Communicator implements Runnable {
 		games = Configuration.getInstance().get("games");		
 	}
 
-	private void print(String string) {
-		System.out.println(string);
-	}
-
 	public void run() {
 		try {
 			String message = null;
 			while((message = player.receive()) != null) {
 				String[] parts = message.split(":");
 				String command = parts[0].trim().toLowerCase();
-				this.print(command);
 				switch (command) {
 				case "conn" :
 					this.connectPlayer(parts[1].trim());
 					break;
 				case "opponent" :
-					this.offerGame(parts[1]);
+					this.offerGame(parts[1].trim());
 					break;
 				}
 			}
@@ -46,13 +37,16 @@ public class Communicator implements Runnable {
 	private void offerGame(String opponentName) throws IOException {
 		String offer = "OFFER:" + player.name + "\n";
 		Player otherPlayer = DataKeeper.players.get(opponentName);
-		otherPlayer.send(offer);
+		if (otherPlayer != null) {
+			otherPlayer.send(offer);
+		}
 	}
 
 	private void connectPlayer(String playerName) throws IOException {
 		if (playerName != null) {
+			this.player.name = playerName;
 			DataKeeper.players.put(playerName, player);
-			this.print(playerName + " connected.");
+			System.out.println(playerName + " connected.");
 			StringBuilder playersOnline = new StringBuilder();
 			Set<String> keys = DataKeeper.players.keySet();
 			for (String name : keys) {

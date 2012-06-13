@@ -22,7 +22,13 @@
 			<manifest>
 				<attribute name="Main-Class" value="kvgameserver.Main" />
 				<attribute name="Class-Path" value=
-				    "${lib.dir}/jetty-server-8.1.3.jar ${lib.dir}/jetty-util-8.1.3.jar ${lib.dir}/jetty-websocket-8.1.3.jar ${lib.dir}/servlet-api-3.0.jar" />
+				    "../lib/jetty-server-8.1.3.jar
+				    ../lib/jetty-util-8.1.3.jar
+				    ../lib/jetty-websocket-8.1.3.jar
+				    ../lib/servlet-api-3.0.jar
+				    ../lib/jetty-http-8.1.3.jar
+				    ../lib/jetty-io-8.1.3.jar
+				    ../lib/jetty-continuation-8.1.3.jar" />
 			</manifest>
 		</jar>
 	</target>
