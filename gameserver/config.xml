@@ -1,5 +1,6 @@
 <!-- game server configuration file -->
 <configuration>
     <port>10508</port>
+    <websocketport>10509</websocketport>
     <games>holdem blackjack checkers crisscross</games>
 </configuration>

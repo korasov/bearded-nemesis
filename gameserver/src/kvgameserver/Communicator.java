@@ -7,28 +7,17 @@ import java.io.OutputStream;
 import java.net.Socket;
 import java.util.Set;
 
+import kvgameserver.players.Player;
 import kvgameserver.service.Configuration;
 
 public class Communicator implements Runnable {
 
-	private Socket socket = null;
-	private BufferedReader br = null;
-	private OutputStream os = null;
 	private String games = null;
-	private String connectionOwner = null;
+	private Player player = null;
 
-	public Communicator(Socket socket) {
-		this.socket = socket;
-		games = Configuration.getInstance().get("games");
-		try {
-			br = new BufferedReader(new InputStreamReader(
-					this.socket.getInputStream()));
-			os = this.socket.getOutputStream();
-		} catch (IOException e) {
-			this.print("Error getting streams from socket. Shutting down.");
-			System.exit(1);
-		}
-		
+	public Communicator(Player player) {
+		this.player = player;
+		games = Configuration.getInstance().get("games");		
 	}
 
 	private void print(String string) {
@@ -38,7 +27,7 @@ public class Communicator implements Runnable {
 	public void run() {
 		try {
 			String message = null;
-			while((message = br.readLine()) != null) {
+			while((message = player.receive()) != null) {
 				String[] parts = message.split(":");
 				String command = parts[0].trim().toLowerCase();
 				this.print(command);
@@ -55,16 +44,14 @@ public class Communicator implements Runnable {
 	}
 
 	private void offerGame(String opponentName) throws IOException {
-		Socket opponentSocket = DataKeeper.players.get(opponentName);
-		OutputStream oos = opponentSocket.getOutputStream();
-		String offer = "OFFER:" + connectionOwner;
-		oos.write(offer.getBytes());
+		String offer = "OFFER:" + player.name + "\n";
+		Player otherPlayer = DataKeeper.players.get(opponentName);
+		otherPlayer.send(offer);
 	}
 
 	private void connectPlayer(String playerName) throws IOException {
 		if (playerName != null) {
-			this.connectionOwner = playerName;
-			DataKeeper.players.put(playerName, socket);
+			DataKeeper.players.put(playerName, player);
 			this.print(playerName + " connected.");
 			StringBuilder playersOnline = new StringBuilder();
 			Set<String> keys = DataKeeper.players.keySet();
@@ -75,9 +62,9 @@ public class Communicator implements Runnable {
 			}
 			String sPlayers = "PLAYERS: " + playersOnline.toString() + "\n";
 			String sGames = "GAMES: " + games + "\n";
-			os.write(sPlayers.getBytes());
+			player.send(sPlayers);
 			// TODO: uncomment here when multiple games implemented:
-			// os.write(sGames.getBytes());
+			// player.send(sGames);
 		}
 	}
 }
