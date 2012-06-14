@@ -10,6 +10,17 @@ public class Communicator implements Runnable {
 
 	private String games = null;
 	private Player player = null;
+	private enum Command {
+		conn("conn"),
+		opponent("opponent"),
+		players("players"),
+		nil(null);
+		
+		private String value = null;
+		private Command(String value) {
+			this.value = value;
+		}
+	}
 
 	public Communicator(Player player) {
 		this.player = player;
@@ -21,15 +32,24 @@ public class Communicator implements Runnable {
 			String message = null;
 			while((message = player.receive()) != null) {
 				String[] parts = message.split(":");
-				String command = parts[0].trim().toLowerCase();
+				String sCommand = parts[0].trim().toLowerCase();
+				Command command = Command.nil;
+				try {
+					command = Command.valueOf(sCommand);
+				} catch (IllegalArgumentException iae) {
+					/*
+					 * do nothing. need this construction in case of
+					 * unsupported incoming command
+					 */ 
+				}
 				switch (command) {
-				case "conn" :
+				case conn :
 					this.connectPlayer(parts[1].trim());
 					break;
-				case "opponent" :
+				case opponent :
 					this.offerGame(parts[1].trim());
 					break;
-				case "players" :
+				case players :
 					this.showPlayers();
 					break;
 				}
@@ -72,6 +92,7 @@ public class Communicator implements Runnable {
 		player.send(sPlayers);
 	}
 
+	@SuppressWarnings("unused")
 	private void showGames() throws IOException {
 		String sGames = "GAMES: " + games + "\n";
 		player.send(sGames);

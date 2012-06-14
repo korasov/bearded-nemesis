@@ -1,6 +1,5 @@
 package kvgameserver;
 
-import java.net.Socket;
 import java.util.Hashtable;
 
 import kvgameserver.players.Player;
