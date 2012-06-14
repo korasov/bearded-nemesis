@@ -29,7 +29,16 @@ public class Communicator implements Runnable {
 				case "opponent" :
 					this.offerGame(parts[1].trim());
 					break;
+				case "players" :
+					this.showPlayers();
+					break;
 				}
+			}
+			/*
+			 * Delete player from player list if connection is lost
+			 */
+			if (message == null) {
+				DataKeeper.players.remove(player.name);
 			}
 		} catch (Exception e) { e.printStackTrace(); }
 	}
@@ -47,18 +56,24 @@ public class Communicator implements Runnable {
 			this.player.name = playerName;
 			DataKeeper.players.put(playerName, player);
 			System.out.println(playerName + " connected.");
-			StringBuilder playersOnline = new StringBuilder();
-			Set<String> keys = DataKeeper.players.keySet();
-			for (String name : keys) {
-				if (!name.equals(playerName)) {
-					playersOnline.append(name).append(" ");
-				}
-			}
-			String sPlayers = "PLAYERS: " + playersOnline.toString() + "\n";
-			String sGames = "GAMES: " + games + "\n";
-			player.send(sPlayers);
-			// TODO: uncomment here when multiple games implemented:
-			// player.send(sGames);
+			showPlayers();
 		}
+	}
+
+	private void showPlayers() throws IOException {
+		StringBuilder playersOnline = new StringBuilder();
+		Set<String> keys = DataKeeper.players.keySet();
+		for (String name : keys) {
+			if (!name.equals(player.name)) {
+				playersOnline.append(name).append(" ");
+			}
+		}
+		String sPlayers = "PLAYERS: " + playersOnline.toString() + "\n";
+		player.send(sPlayers);
+	}
+
+	private void showGames() throws IOException {
+		String sGames = "GAMES: " + games + "\n";
+		player.send(sGames);
 	}
 }
