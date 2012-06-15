@@ -22,8 +22,9 @@ public class ChoiseView {
 	ChoiseView(final Client_Desktop client){
 		this.client=client;
 		
-		name=client.getPlayerList();
-			System.out.println("playerlist "+ name.size());	
+		name=client.getPlayers();
+	
+	System.out.println("playerlist "+ name.size());	
 	frame.setSize(170, 170);
 	frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	frame.setVisible(true);
@@ -32,14 +33,17 @@ public class ChoiseView {
 	panel.setLayout(new FlowLayout());
 	frame.add(panel);
 	
-	JLabel label = new JLabel("Choose player");
-	JButton button2 = new JButton("  Submit  ");
+	final JLabel label = new JLabel("Choose player");
+	JButton button2 = new JButton("  OK  ");
 	
 	panel.add(label);
 		
 	final JPanel ChoisePanel = new JPanel();
+	if (name.size()==0) label.setText("Try again later");
+	 else{
 	ChoisePanel.setLayout(new GridLayout(name.size(),0));
-	panel.add(ChoisePanel);
+	
+	panel.add(ChoisePanel);}
 	panel.add(button2);
 	
 	ButtonGroup group = new ButtonGroup();
@@ -57,17 +61,15 @@ public class ChoiseView {
 		public void actionPerformed(ActionEvent e) {
 			//сервер посылет запрос об играе оппоненту
 			//новая игра создается на клиенте в случае положительного ответа
+			if (name.size()!=0){
+			frame.dispose(); 			
+			client.gameReqest(myListener.playername);} 
 			
-			//client.sendMessage("Opponent:"+myListener.playername);
-			//client.gameReqest(); вместо 2строки ниже
+			label.setText("Try again");
 			
+			//new AlertMessage(client);
+						
 			
-			//new AlertMessage(client).cancel();
-			//new AlertMessage(client).anotherGame();
-			
-			new GameView();
-			
-			frame.dispose(); 
 		}
 	});
 	}

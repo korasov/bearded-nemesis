@@ -8,23 +8,25 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Client_Desktop {
+public class Client_Desktop implements Runnable {
 
 	private Socket socket = null;
 	private BufferedReader br = null;
 	private OutputStream os = null;
 	private String command = null;
 	private String message = null;
+	private String opponent = null;
+	private GameView game = null;
 
+	//открываем соеденение
 	Client_Desktop(Socket socket) {
 		this.socket = socket;
-	}
-
-	private void openSocket() {
 		try {
 			os = this.socket.getOutputStream();
 			br = new BufferedReader(new InputStreamReader(
 					socket.getInputStream()));
+			Thread t= new Thread(this);
+			t.start();
 		} catch (IOException e) {
 			// this.print("Error getting streams from socket. Shutting down.");
 			System.exit(1);
@@ -43,18 +45,19 @@ public class Client_Desktop {
 	}
 
 	void sendMessage(String message) {
-		openSocket();
+		System.out.println("Client  "+message);
 		try {
 			os.write(message.getBytes());
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		setResponse();
-
 	}
+	
+	
+	public List<String> getPlayers() {
+		sendMessage("players");
 
-	List<String> getPlayerList() {
 		List<String> players = new ArrayList<String>();
 		if (command == "players") {
 			String[] arr = message.split(" ");
@@ -63,51 +66,94 @@ public class Client_Desktop {
 				for (int i = 0; i < arr.length; i++) {
 					players.add(arr[i]);
 				}
-
 		}
+	
 		// пока сервер не отдает список. затем удалить
-		players.add("Игрок1");
-		players.add("Игрок2");
+		//players.add("Игрок1");
+		//players.add("Игрок2");
+		
 		return players;
 	}
 
-	void gameReqest() {
-		setResponse();
-
-		if (command == "game_response") {
-			if (message == "yes") {
-				new GameView();
-			} else
-				new AlertMessage(this).cancel();
-		}
-
+	public String getOpponent() {
+		return opponent;
 	}
 
-	void setResponse() {
-		if (socket.isClosed()) {
-			System.out.println("Socket is closed!");
-			return;
+	void gameReqest(String playername) {
+		sendMessage("Opponent:" + playername);
+		opponent = playername;
+
+		if (command == "start") {
+			if (message == "cross") {
+			game=new GameView("cross",this);
+			} else
+				game=new GameView("zero",this);
+		} else if (command == "rejected") {
+			new AlertMessage(this).cancel();
 		}
+		
+	}
 
-		String input = null;
-		String data = "";
+	void put(String step) {
+		sendMessage("PUT:" + step);
 
-		try {
-			while ((data = br.readLine()) != null) {
-				data += input + "\n";
+		if (command == "status") {
+			if (message == "won") {
+				new AlertMessage(this).anotherGame("win");
+			} else
+				new AlertMessage(this).anotherGame("lose");
+		}
+		
+		else if(command == "put") 
+			if(message.length()==2) game.put(message);		
+	}
+
+	void loggin(String name) {
+		sendMessage("CONN:" + name);
+		new ChoiseView(this);
+	}
+
+
+//постоянно отслеживаем ответы.
+	@Override
+	public void run() {
+		
+		while (true) {
+			
+			if (socket.isClosed()) {
+				System.out.println("Socket is closed!");
+				new AlertMessage(this).serverFail();
+				return;
 			}
-		} catch (IOException e) {
+			
+			String input = null;
+			String data = "";
+			try {
+				while ((data = br.readLine()) != null) {
+					data += input + "\n";
+					System.out.println("Server"+message);
+				}
+				
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
+			String[] parts = null;
+
+			if (data != null) {
+				parts = data.split(":");
+				command = parts[0].trim().toLowerCase();
+				//if (parts[1]!=null)
+				message = parts[1].trim().toLowerCase();
+			}
+			
+		try {
+			Thread.sleep(1000);
+		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+		}}
 		}
-		closeSocket();
-		String[] parts = null;
-
-		if (data != null) {
-			parts = data.split(":");
-			command = parts[0].trim().toLowerCase();
-			message = parts[1].trim().toLowerCase();
-		}
-
 	}
-}
+

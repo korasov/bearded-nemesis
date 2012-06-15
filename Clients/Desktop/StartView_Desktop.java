@@ -3,7 +3,9 @@ import java.awt.FlowLayout;
 import java.awt.TextField;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.IOException;
 import java.net.Socket;
+import java.net.UnknownHostException;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -41,11 +43,19 @@ public class StartView_Desktop {
 			username=addItem.getText();
 			System.out.println(username);
 			//добавляемся в список клиентов
-			Socket socket=new Socket();
+			Socket socket = null;
+			try {
+				socket = new Socket("localhost",10508);
+			} catch (UnknownHostException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+				
+			} catch (IOException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			} 
 			Client_Desktop client=new Client_Desktop(socket);
-			//client.sendMessage("CONN:"+username);
-			new ChoiseView(client);
-			
+			client.loggin(username);
 			frame.dispose(); 
 			
 		}

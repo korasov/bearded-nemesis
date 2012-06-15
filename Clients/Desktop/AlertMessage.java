@@ -29,7 +29,7 @@ public class AlertMessage {
 
 	void cancel() {
 		JLabel label1 = new JLabel(
-				"User refused to play. \nChoose another player.");
+				"User refused to play. Choose another player.");
 		JButton button = new JButton("  Ok  ");
 
 		panel.add(label1);
@@ -44,9 +44,9 @@ public class AlertMessage {
 		});
 	}
 
-	void anotherGame() {
+	void anotherGame(String gameResult) {
 		JLabel label1 = new JLabel(
-				"Do you want to play with this player again?");
+				"You"+gameResult+". Do you want to play with this player again?");
 		JButton button1 = new JButton("  Yes  ");
 		JButton button2 = new JButton("  No  ");
 
@@ -56,7 +56,8 @@ public class AlertMessage {
 
 		button1.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				new GameView();
+				client.gameReqest(client.getOpponent());
+				//new GameView();
 				frame.dispose();
 
 			}
@@ -69,6 +70,42 @@ public class AlertMessage {
 
 			}
 		});
+	}
+
+	 void serverFail() {
+		JLabel label1 = new JLabel(
+				"Server currently doesn't response. Try later.");
+		JButton button = new JButton("  Ok  ");
+
+		panel.add(label1);
+		panel.add(button);
+
+		button.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				//new ChoiseView(client);
+				frame.dispose();
+
+			}
+		});
+		
+	}
+	
+	 void weitForTurn() {
+		JLabel label1 = new JLabel(
+				"Wait for your turn!");
+		JButton button = new JButton("  Ok  ");
+
+		panel.add(label1);
+		panel.add(button);
+
+		button.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				//new ChoiseView(client);
+				frame.dispose();
+
+			}
+		});
+		
 	}
 
 }
