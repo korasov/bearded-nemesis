@@ -14,15 +14,11 @@ public class Communicator implements Runnable {
 	private static final String gamename = "TicTacToe";
 	// one day this one above will be used
 	private enum Command {
-		conn("conn"),
-		opponent("opponent"),
-		players("players"),
-		nil(null);
-		
-		private String value = null;
-		private Command(String value) {
-			this.value = value;
-		}
+		conn,
+		opponent,
+		players,
+		offerresponse,
+		nil;
 	}
 
 	public Communicator(Player player) {
@@ -48,6 +44,7 @@ public class Communicator implements Runnable {
 					 * unsupported incoming command
 					 */ 
 				}
+				System.out.println(command);
 				switch (command) {
 				case conn :
 					this.connectPlayer(parts[1].trim());
@@ -57,6 +54,9 @@ public class Communicator implements Runnable {
 					break;
 				case players :
 					this.showPlayers();
+					break;
+				case offerresponse :
+					this.ofrespo(parts[1].toLowerCase().trim());
 					break;
 				}
 				if (!DataKeeper.lobby.contains(player)) {
@@ -72,21 +72,26 @@ public class Communicator implements Runnable {
 		} catch (Exception e) { e.printStackTrace(); }
 	}
 
+	private void ofrespo(String answer) {
+		Player offerer = DataKeeper.lobby.get(player.offerFrom);
+		if (answer.equals("no")) {
+			try {
+				offerer.send("REJECTED: " + player.name);
+			} catch (IOException ioe) {
+				//maybe later
+			}
+		}
+		if (answer.equals("yes")) {
+			this.startGame(gamename, player, offerer);
+		}
+	}
+
 	private void offerGame(String opponentName) throws IOException {
 		String offer = "OFFER:" + player.name + "\n";
 		Player otherPlayer = DataKeeper.lobby.get(opponentName);
 		if (otherPlayer != null) {
 			otherPlayer.send(offer);
-			String answer = otherPlayer.receive();
-			if (answer.startsWith("OFFERRESPONSE")) {
-				String[] parts = answer.split(":");
-				String ack = parts[1];
-				if (ack.equalsIgnoreCase("yes")) {
-					this.startGame(gamename, player, otherPlayer);
-				} else {
-					player.send("REJECTED: " + otherPlayer.name + "\n");
-				}
-			}
+			otherPlayer.offerFrom = player.name;
 		}
 	}
 
@@ -118,6 +123,8 @@ public class Communicator implements Runnable {
 	}
 
 	private void startGame(String name, Player playerOne, Player playerTwo) {
+		System.out.println("Starting a game. Players: " + playerOne.name
+				 + " " + playerTwo.name);
 		Runnable game = GameFactory.createGame(name, playerOne, playerTwo);
 		DataKeeper.lobby.remove(playerOne.name);
 		DataKeeper.lobby.remove(playerTwo.name);

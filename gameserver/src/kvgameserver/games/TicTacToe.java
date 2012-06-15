@@ -97,7 +97,7 @@ public class TicTacToe implements Runnable {
 		String message = from.receive();
 		String[] messageParts = message.split(":");
 		String command = messageParts[0];
-		String attrs = messageParts[1];
+		String attrs = messageParts[1].trim();
 		String[] attrParts = null;
 		if (command.equalsIgnoreCase("put")) {
 			attrParts = attrs.split(" ");
