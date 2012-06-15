@@ -84,11 +84,11 @@ public class TicTacToe implements Runnable {
 				winner = field[1][y];
 			}
 		}
-		if ((field[1][1] == field[2][2]) && (field[2][2] == field[3][3])) {
-			winner = field[2][2];
+		if ((field[0][0] == field[1][1]) && (field[1][1] == field[2][2])) {
+			winner = field[1][1];
 		}
-		if ((field[3][1] == field[2][2]) && (field[2][2] == field[1][3])) {
-			winner = field[2][2];
+		if ((field[2][0] == field[1][1]) && (field[1][1] == field[0][2])) {
+			winner = field[1][1];
 		}
 		return winner;
 	}
@@ -96,18 +96,17 @@ public class TicTacToe implements Runnable {
 	private void playerMove(TTTPlayer from, TTTPlayer to) throws IOException {
 		String message = from.receive();
 		String[] messageParts = message.split(":");
-		String command = messageParts[0];
+		String command = messageParts[0].trim();
 		String attrs = messageParts[1].trim();
 		String[] attrParts = null;
-		if (command.equalsIgnoreCase("put")) {
-			attrParts = attrs.split(" ");
-		}
+		attrParts = attrs.split(" ");
 		int x = Integer.parseInt(attrParts[0]);
 		int y = Integer.parseInt(attrParts[1]);
 		if (field[x][y] == EMPTY) {
 			field[x][y] = from.sign;
 			to.send(message);
 		} else {
+			from.send("NEIN!");
 			playerMove(from, to);
 		}
 	}
