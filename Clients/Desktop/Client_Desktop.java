@@ -3,76 +3,45 @@ package DesktopView;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
+import java.io.PrintWriter;
 import java.net.Socket;
-import java.util.ArrayList;
-import java.util.List;
 
 public class Client_Desktop implements Runnable {
 
-	private Socket socket = null;
 	private BufferedReader br = null;
-	private OutputStream os = null;
+	private PrintWriter pr = null;
 	private String command = null;
-	private String message = null;
+	private String message = "";
 	private String opponent = null;
-	private GameView game = null;
+	
+	private Socket socket = null;
+	Command comm=new Command(this);
 
-	//открываем соеденение
-	Client_Desktop(Socket socket) {
-		this.socket = socket;
+	// открываем соеденение
+	Client_Desktop() {
+
 		try {
-			os = this.socket.getOutputStream();
+			socket = new Socket("127.0.0.1", 10508);
+			pr = new PrintWriter(socket.getOutputStream(), true);
+			pr.flush();
 			br = new BufferedReader(new InputStreamReader(
 					socket.getInputStream()));
-			Thread t= new Thread(this);
+
+			Thread t = new Thread(this);
 			t.start();
 		} catch (IOException e) {
-			// this.print("Error getting streams from socket. Shutting down.");
 			System.exit(1);
 		}
 	}
 
-	private void closeSocket() {
-		try {
-			br.close();
-			os.close();
-			socket.close();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
-
 	void sendMessage(String message) {
-		System.out.println("Client  "+message);
-		try {
-			os.write(message.getBytes());
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		System.out.println("Client sent: " + message);
+		pr.println(message);
 	}
+
 	
-	
-	public List<String> getPlayers() {
+	public void getPlayers() {
 		sendMessage("players");
-
-		List<String> players = new ArrayList<String>();
-		if (command == "players") {
-			String[] arr = message.split(" ");
-
-			if (arr.length > 0)
-				for (int i = 0; i < arr.length; i++) {
-					players.add(arr[i]);
-				}
-		}
-	
-		// пока сервер не отдает список. затем удалить
-		//players.add("Игрок1");
-		//players.add("Игрок2");
-		
-		return players;
 	}
 
 	public String getOpponent() {
@@ -80,80 +49,52 @@ public class Client_Desktop implements Runnable {
 	}
 
 	void gameReqest(String playername) {
-		sendMessage("Opponent:" + playername);
+		sendMessage("OPPONENT:" + playername);
 		opponent = playername;
-
-		if (command == "start") {
-			if (message == "cross") {
-			game=new GameView("cross",this);
-			} else
-				game=new GameView("zero",this);
-		} else if (command == "rejected") {
-			new AlertMessage(this).cancel();
-		}
-		
 	}
 
 	void put(String step) {
 		sendMessage("PUT:" + step);
-
-		if (command == "status") {
-			if (message == "won") {
-				new AlertMessage(this).anotherGame("win");
-			} else
-				new AlertMessage(this).anotherGame("lose");
-		}
-		
-		else if(command == "put") 
-			if(message.length()==2) game.put(message);		
 	}
 
 	void loggin(String name) {
 		sendMessage("CONN:" + name);
-		new ChoiseView(this);
+
 	}
 
 
-//постоянно отслеживаем ответы.
+	// постоянно отслеживаем ответы.
 	@Override
 	public void run() {
-		
+
 		while (true) {
-			
-			if (socket.isClosed()) {
-				System.out.println("Socket is closed!");
-				new AlertMessage(this).serverFail();
-				return;
-			}
-			
-			String input = null;
-			String data = "";
+			String strComamnd=null;
 			try {
-				while ((data = br.readLine()) != null) {
-					data += input + "\n";
-					System.out.println("Server"+message);
-				}
-				
+				strComamnd = br.readLine();
+				System.out.println(strComamnd);
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-
-			String[] parts = null;
-
-			if (data != null) {
-				parts = data.split(":");
-				command = parts[0].trim().toLowerCase();
-				//if (parts[1]!=null)
-				message = parts[1].trim().toLowerCase();
-			}
 			
-		try {
-			Thread.sleep(1000);
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}}
+			//распарсили входящее сообщение на комманду и текст
+			String[] parts = null;
+			 if (strComamnd != null) {
+			 parts = strComamnd.split(":");
+			 command = parts[0].trim().toLowerCase();
+			 if (parts[1]!=null)
+			 message = parts[1].trim().toLowerCase();
+			 }
+					 
+			switch (Command.type(command)){
+			case Command.PLAYERS:{ comm.getPlayers(message); break;}
+			case Command.OFFER:{ comm.offer(message); break;}
+			case Command.START:{ comm.initStart(message); break;}
+			case Command.STATUS:{ comm.status(message); break;}
+			case Command.REJECTED:{ comm.rejected(message); break;}
+			case Command.PUT: {comm.put(message); break;}
+			default: { System.out.println("Неизвестная команда");break;}
+			}
 		}
 	}
 
+}
