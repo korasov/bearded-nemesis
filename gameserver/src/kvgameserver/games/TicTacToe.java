@@ -2,7 +2,6 @@ package kvgameserver.games;
 
 import java.io.IOException;
 
-import kvgameserver.Communicator;
 import kvgameserver.players.Player;
 
 public class TicTacToe implements Runnable {
@@ -36,8 +35,8 @@ public class TicTacToe implements Runnable {
 	@Override
 	public void run() {
 		try {
-			playerOne.send("START:CROSS\n");
-			playerTwo.send("START:ZERO\n");
+			playerOne.send("START:CROSS");
+			playerTwo.send("START:ZERO");
 			byte winner = EMPTY;
 			while (true) {
 				playerMove(playerOne, playerTwo);
@@ -58,14 +57,7 @@ public class TicTacToe implements Runnable {
 				playerTwo.send("WIN");
 			}
 			//TODO: implement "one more game" ability
-			Player first = playerOne.getPlayer();
-			Player second = playerTwo.getPlayer();
-			Communicator commfirst = new Communicator(first);
-			Communicator commsecond = new Communicator(second);
-			Thread tf = new Thread(commfirst);
-			Thread ts = new Thread(commsecond);
-			tf.start();
-			ts.start();
+			// TODO : return to lobby
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -75,12 +67,12 @@ public class TicTacToe implements Runnable {
 	private byte checkField() {
 		byte winner = EMPTY;
 		for (int x = 0; x < 3; x++) {
-			if ((field[x][1] == field[x][2]) && (field[x][2] == field[x][3])) {
+			if ((field[x][0] == field[x][1]) && (field[x][1] == field[x][2])) {
 				winner = field[x][1];
 			}
 		}
 		for (int y = 0; y < 3; y++) {
-			if ((field[1][y] == field[2][y]) && (field[2][y] == field[3][y])) {
+			if ((field[0][y] == field[1][y]) && (field[1][y] == field[2][y])) {
 				winner = field[1][y];
 			}
 		}
@@ -96,7 +88,7 @@ public class TicTacToe implements Runnable {
 	private void playerMove(TTTPlayer from, TTTPlayer to) throws IOException {
 		String message = from.receive();
 		String[] messageParts = message.split(":");
-		String command = messageParts[0].trim();
+		// TODO : should be a check for "put" command
 		String attrs = messageParts[1].trim();
 		String[] attrParts = null;
 		attrParts = attrs.split(" ");
