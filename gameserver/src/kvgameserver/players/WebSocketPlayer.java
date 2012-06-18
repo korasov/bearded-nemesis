@@ -1,6 +1,7 @@
 package kvgameserver.players;
 
 import java.io.IOException;
+import java.util.LinkedList;
 
 import kvgameserver.LoginService;
 
@@ -9,8 +10,7 @@ import org.eclipse.jetty.websocket.WebSocket;
 public class WebSocketPlayer extends Player implements WebSocket.OnTextMessage {
 
 	private Connection connection = null;
-	private String lastMessage = null;
-	private boolean incomingMessage = false;
+	private LinkedList<String> messages = null;
 
 	@Override
 	public void send(String message) throws IOException {
@@ -19,8 +19,7 @@ public class WebSocketPlayer extends Player implements WebSocket.OnTextMessage {
 
 	@Override
 	public String receive() throws IOException {
-		incomingMessage = false;
-		return lastMessage;
+		return messages.poll();
 	}
 
 	@Override
@@ -30,18 +29,18 @@ public class WebSocketPlayer extends Player implements WebSocket.OnTextMessage {
 	@Override
 	public void onOpen(Connection connection) {
 		WebSocketPlayer.this.connection = connection;
+		messages = new LinkedList<String>();
 		LoginService.login(this);
 	}
 
 	@Override
 	public void onMessage(String message) {
-		WebSocketPlayer.this.lastMessage = message;
-		incomingMessage = true;
+		 messages.add(message);
 	}
 
 	@Override
 	public boolean hasIncoming() throws IOException {
-		return incomingMessage;
+		return !messages.isEmpty();
 	}
 
 }

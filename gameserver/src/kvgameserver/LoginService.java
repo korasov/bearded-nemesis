@@ -13,14 +13,14 @@ public class LoginService {
 				try {
 					boolean notLoggedIn = true;
 					while(notLoggedIn) {
-						Thread.sleep(50);
 						if (!player.hasIncoming()) {
 							continue;
 						}
 						String message = player.receive();
 						System.out.println(message);
 						String[] messageParts = message.split(":");
-						if (messageParts[0].trim().toLowerCase().equals("conn")) {
+						if (messageParts[0].trim().toLowerCase().
+								equals("conn")) {
 							player.name = messageParts[1];
 							DataKeeper.lobby.put(player.name, player);
 							System.out.println(player.name + " logged in.");
@@ -28,7 +28,6 @@ public class LoginService {
 						}
 					}
 				} catch (IOException ioe) {/*do nothing*/}
-				  catch (InterruptedException e) {/* do nothing*/}
 			}
 		};
 		t.start();

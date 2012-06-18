@@ -43,11 +43,11 @@ public class TicTacToe implements Runnable {
 			byte winner = EMPTY;
 			while (true) {
 				playerMove(playerOne, playerTwo);
-				if((winner = checkField()) != EMPTY){
+				if((winner = checkField()) != EMPTY) {
 					break;
 				}
 				playerMove(playerTwo, playerOne);
-				if((winner = checkField()) != EMPTY){
+				if((winner = checkField()) != EMPTY) {
 					break;
 				}
 			}
@@ -132,6 +132,7 @@ public class TicTacToe implements Runnable {
 			return player.receive();
 		}
 
+		@SuppressWarnings("unused")
 		public Player getPlayer() {
 			return this.player;
 		}
