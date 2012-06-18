@@ -1,6 +1,7 @@
 package kvgameserver.games;
 
 import java.io.IOException;
+import java.util.Arrays;
 
 import kvgameserver.players.Player;
 
@@ -13,6 +14,8 @@ public class TicTacToe implements Runnable {
 	private static byte EMPTY = 0;
 	private static byte CROSS = 1;
 	private static byte ZERO = -1; // oh i am a bad bad boy
+
+	private static int CHARTABLE_START = 0x30;
 
 	public TicTacToe(Player first, Player second) {
 		field = new byte[3][3];
@@ -65,6 +68,7 @@ public class TicTacToe implements Runnable {
 	}
 
 	private byte checkField() {
+		printField();
 		byte winner = EMPTY;
 		for (int x = 0; x < 3; x++) {
 			if ((field[x][0] == field[x][1]) && (field[x][1] == field[x][2])) {
@@ -85,15 +89,22 @@ public class TicTacToe implements Runnable {
 		return winner;
 	}
 
+	private void printField() {
+		for (int x = 0; x < field.length; x++) {
+			for (int y = 0; y < field[0].length; y++) {
+				System.out.print(field[x][y] + "\t");
+			}
+			System.out.println();
+		}
+	}
+
 	private void playerMove(TTTPlayer from, TTTPlayer to) throws IOException {
 		String message = from.receive();
 		String[] messageParts = message.split(":");
 		// TODO : should be a check for "put" command
 		String attrs = messageParts[1].trim();
-		String[] attrParts = null;
-		attrParts = attrs.split(" ");
-		int x = Integer.parseInt(attrParts[0]);
-		int y = Integer.parseInt(attrParts[1]);
+		int x = attrs.charAt(0) - CHARTABLE_START;
+		int y = attrs.charAt(1) - CHARTABLE_START;
 		if (field[x][y] == EMPTY) {
 			field[x][y] = from.sign;
 			to.send(message);
