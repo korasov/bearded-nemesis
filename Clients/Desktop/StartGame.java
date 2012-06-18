@@ -33,6 +33,7 @@ public class StartGame {
 		panel.add(addItem);
 		panel.add(button);
 
+					
 		button.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				username = addItem.getText();

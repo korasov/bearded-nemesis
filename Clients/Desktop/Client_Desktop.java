@@ -59,6 +59,7 @@ public class Client_Desktop implements Runnable {
 
 	void loggin(String name) {
 		sendMessage("CONN:" + name);
+		getPlayers();
 
 	}
 
@@ -81,7 +82,8 @@ public class Client_Desktop implements Runnable {
 			 if (strComamnd != null) {
 			 parts = strComamnd.split(":");
 			 command = parts[0].trim().toLowerCase();
-			 if (parts[1]!=null)
+		
+			 if (parts.length>1)
 			 message = parts[1].trim().toLowerCase();
 			 }
 					 
@@ -93,6 +95,7 @@ public class Client_Desktop implements Runnable {
 			case Command.REJECTED:{ comm.rejected(message); break;}
 			case Command.PUT: {comm.put(message); break;}
 			default: { System.out.println("Неизвестная команда");break;}
+			
 			}
 		}
 	}

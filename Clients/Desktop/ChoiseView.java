@@ -20,7 +20,7 @@ public class ChoiseView {
 	Client_Desktop client=null;
 	List<String> name=null;
 
-	public ChoiseView(final Client_Desktop client, List<String> name) {
+	public ChoiseView(final Client_Desktop client, final List<String> name) {
 		this.client=client;
 		this.name=name;
 	
@@ -31,11 +31,13 @@ public class ChoiseView {
 		panel.setLayout(new GridLayout(0,1));
 		frame.add(panel);
 
-		final JLabel label = new JLabel("Choose player");
+		final JLabel label = new JLabel("No players online. Try leater");
 		JButton ok = new JButton("  OK  ");
+		
 		panel.add(label);
+		if(name!=null){ label.setText("Choose player");
 		ChoisePanel.setLayout(new GridLayout(name.size(), 0));
-		panel.add(ChoisePanel);
+		panel.add(ChoisePanel);}
 		panel.add(ok);
 
 		ButtonGroup group = new ButtonGroup();
@@ -51,8 +53,10 @@ public class ChoiseView {
 
 		ok.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				if(name!=null)
 					client.gameReqest(myListener.playername);
-					frame.dispose();
+					
+				frame.dispose();
 					
 					
 			}
