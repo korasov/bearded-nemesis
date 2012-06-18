@@ -8,21 +8,33 @@ import kvgameserver.players.Player;
 
 public class Lobby implements Runnable {
 
-	private enum Command{players, opponent, offerresponse, nullcommand};
+	private static enum Command{players, opponent, offerresponse, nullcommand};
+
+	private static int CYCLE_TIME = 1000;
 
 	private String gameName = "TicTacToe";
 
 	public void run() {
 		while (true) {
 			Enumeration<Player> players = DataKeeper.lobby.elements();
+			int playernum = DataKeeper.lobby.size();
+			int pause = CYCLE_TIME / (playernum + 1);
+			// + 1 is needed to prevent division by zero
+			try {
+				Thread.sleep(pause);
+			} catch (InterruptedException e1) {
+				e1.printStackTrace();
+			}
 			while (players.hasMoreElements()) {
 				Player player = players.nextElement();
 				try {
+					Thread.sleep(pause);
 					boolean playerReady = player.hasIncoming();
 					if (!playerReady) {
 						continue;
 					}
 					String message = player.receive();
+					System.out.println(message);
 					String[] messageParts = message.split(":");
 					String sCommand = messageParts[0].trim().toLowerCase();
 					Command command = Command.nullcommand;
@@ -31,7 +43,7 @@ public class Lobby implements Runnable {
 					} catch (IllegalArgumentException iae) {/*do nothing*/}
 					switch (command) {
 					case players:
-						returnPlayerList(player, players);
+						returnPlayerList(player);
 						break;
 					case opponent:
 						String opponent = messageParts[1].trim();
@@ -42,11 +54,10 @@ public class Lobby implements Runnable {
 						processResponse(player, answer);
 						break;
 					}
-				} catch (IOException e) {
+				} catch (Exception e) {
 					e.printStackTrace();
 				}
 			}
-			Thread.yield();
 		}
 	}
 
@@ -72,12 +83,16 @@ public class Lobby implements Runnable {
 		pOpponent.send("OFFER:" + player.name);
 	}
 
-	private void returnPlayerList(Player player, Enumeration<Player> players)
+	private void returnPlayerList(Player player)
 			throws IOException {
 		StringBuilder playerList = new StringBuilder();
+		Enumeration<Player> players = DataKeeper.lobby.elements();
 		playerList.append("PLAYERS:");
 		while (players.hasMoreElements()) {
 			Player current = players.nextElement();
+			if (current.name.equals(player.name)) {
+				continue;
+			}
 			playerList.append(current.name);
 			playerList.append(" ");
 		}

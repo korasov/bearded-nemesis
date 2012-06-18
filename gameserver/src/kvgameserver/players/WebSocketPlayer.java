@@ -19,12 +19,12 @@ public class WebSocketPlayer extends Player implements WebSocket.OnTextMessage {
 
 	@Override
 	public String receive() throws IOException {
+		incomingMessage = false;
 		return lastMessage;
 	}
 
 	@Override
 	public void onClose(int closeCode, String closeMessage) {
-		lastMessage = null;
 	}
 
 	@Override
