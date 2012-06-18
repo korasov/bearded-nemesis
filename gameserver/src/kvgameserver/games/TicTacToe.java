@@ -3,6 +3,7 @@ package kvgameserver.games;
 import java.io.IOException;
 import java.util.Arrays;
 
+import kvgameserver.DataKeeper;
 import kvgameserver.players.Player;
 
 public class TicTacToe implements Runnable {
@@ -10,6 +11,7 @@ public class TicTacToe implements Runnable {
 	private TTTPlayer playerOne = null;
 	private TTTPlayer playerTwo = null;
 	private byte[][] field = null;
+	private byte movesMade = 0;
 
 	private static byte EMPTY = 0;
 	private static byte CROSS = 1;
@@ -46,6 +48,9 @@ public class TicTacToe implements Runnable {
 				if((winner = checkField()) != EMPTY) {
 					break;
 				}
+				if(movesMade == 9) {
+					break;
+				}
 				playerMove(playerTwo, playerOne);
 				if((winner = checkField()) != EMPTY) {
 					break;
@@ -59,7 +64,11 @@ public class TicTacToe implements Runnable {
 				playerOne.send("LOSE");
 				playerTwo.send("WIN");
 			}
-			//TODO: implement "one more game" ability
+			if (winner == EMPTY) {
+				playerOne.send("DRAW");
+				playerTwo.send("DRAW");
+			}
+			afterGameCheck();
 			// TODO : return to lobby
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -67,17 +76,51 @@ public class TicTacToe implements Runnable {
 		
 	}
 
+	private void afterGameCheck() throws IOException {
+		String fromFirst = playerOne.receive();
+		String fromSecond = playerTwo.receive();
+		String fromFirstAnswer = fromFirst.split(":")[1];
+		String fromSecondAnswer = fromSecond.split(":")[1];
+		if (fromSecondAnswer.equalsIgnoreCase("yes") &&
+				fromFirstAnswer.equalsIgnoreCase("yes")) {
+			Runnable game = GameFactory.createGame("TicTacToe",
+					playerOne.getPlayer(),
+					playerTwo.getPlayer());
+			Thread gameThread = new Thread(game);
+			gameThread.start();
+		}
+		if (!fromSecondAnswer.equalsIgnoreCase(fromFirstAnswer)) {
+			if (fromFirstAnswer.equalsIgnoreCase("no")) {
+				playerTwo.send("REJECTED:" + playerOne.getPlayer().name);
+			}
+			if (fromSecondAnswer.equalsIgnoreCase("no")) {
+				playerOne.send("REJECTED:" + playerTwo.getPlayer().name);
+			}
+		}
+		if (fromFirstAnswer.equalsIgnoreCase("no") &&
+				fromSecondAnswer.equalsIgnoreCase("no")) {
+			DataKeeper.lobby.put(playerOne.getPlayer().name,
+					playerOne.getPlayer());
+			DataKeeper.lobby.put(playerTwo.getPlayer().name,
+					playerTwo.getPlayer());
+		}
+	}
+
 	private byte checkField() {
 		printField();
 		byte winner = EMPTY;
 		for (int x = 0; x < 3; x++) {
-			if ((field[x][0] == field[x][1]) && (field[x][1] == field[x][2])) {
-				winner = field[x][1];
+			int row = field[x][0] + field[x][1] + field[x][2];
+			if (Math.abs(row) == 3) {
+				winner = (byte) (row / 3);
+				break;
 			}
 		}
 		for (int y = 0; y < 3; y++) {
-			if ((field[0][y] == field[1][y]) && (field[1][y] == field[2][y])) {
-				winner = field[1][y];
+			int col = field[0][y] + field[1][y] + field[2][y];
+			if(Math.abs(col) == 3) {
+				winner = (byte) (col / 3);
+				break;
 			}
 		}
 		if ((field[0][0] == field[1][1]) && (field[1][1] == field[2][2])) {
@@ -108,6 +151,7 @@ public class TicTacToe implements Runnable {
 		if (field[x][y] == EMPTY) {
 			field[x][y] = from.sign;
 			to.send(message);
+			++movesMade;
 		} else {
 			from.send("NEIN!");
 			playerMove(from, to);
