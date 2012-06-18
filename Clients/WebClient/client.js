@@ -1,14 +1,14 @@
-//--------------инициализация клиента
+﻿//--------------инициализация клиента
 
 window.addEventListener("load", init, false);
-var wsUri = "ws://127.0.0.1:8888";
+
+var wsUri = "ws://127.0.0.1:10509";
 var output;
 
 function init()
 {   output = document.getElementById("output");
     openWebSocket();
-    initUpdate();
-}
+  }
 
 function openWebSocket()
 {
@@ -28,21 +28,27 @@ function onClose(evt)
     writeToScreen("DISCONNECTED");
 }
 
-
-
+var command;
+var inMessage;
 //принятие и оработка запроса
 function onMessage(evt)
 {
     var mess = evt.data;
+    var arr = mess.split(':');
 
-    if (mess == "clear"){
-        doClear();
-    }
-    else if (mess.substring(0, 3) == "add"){
+    command= arr[0].toLowerCase();
+    if (inMessage!=null)
+        inMessage=arr[1].trim();
 
-        var get=eval(mess.substring(4, mess.length));
-
-        initUpdate(get);
+    switch(command)  {
+        case "players": initPersList(inMessage); break;
+        case "offer": //Offer message
+            break;
+        case "start": newGame(inMessage); break;
+        case "status":  gameOver(inMessage); break;
+        case "rejected": writeToScreen("Choose another player"); break;
+        case "put":  put(inMessage);break;
+        default: alert("Unknown command was sent. It was "+command); break;
     }
     writeToScreen('<span style="color: blue;">RESPONSE: ' + evt.data+'</span>');
 }
@@ -53,7 +59,7 @@ function onError(evt)
 }
 
 function doSend(message){
-    writeToScreen("SENT: " + message);
+    writeToScreen(message);
     websocket.send(message);
 }
 
@@ -67,8 +73,10 @@ function writeToScreen(message)
 //---------------------установка Имени пользоватля
 
 function getName(){
-  var name = document.getElementById("inp").value;
+    var name = document.getElementById("inp").value;
+    alert(name);
     doSend("CONN:"+name);
+    doSend("players");
     location.replace('ChoosePlayer.html');
 }
 //----------------выбор соперника
@@ -79,14 +87,9 @@ function setPlayer(){
     location.replace('WebView.html');
 }
 
-function initUpdate(get){
-    for(var i=0;i<get.length;i++){
-        fill(-1,get[i].ID,get[i].First_Name,get[i].Last_Name,get[i].Age,get[i].Phone);
-    }
-}
-var array = [ "sss","sdf","grf" ]; //получаем этот список при коннекте к серверу.
-
-function initPersList(){
+function initPersList(inMessage){
+    var array = inMessage.split(" ");
+    if(array.length==0)  alert("Вы единственный игрок. Ждите.")
     var inputRadio="";
     for ( keyVar in array ) {
 
@@ -110,29 +113,44 @@ return chosen;
 
 //--------------сессия игры
 //получаем X/O и право хода
-
 var mark="X"
 var turn=true
+function newGame(inMessage){
+    if (inMessage == "cross") {
+        turn = true;
+        mark = "X";
+        mark2="O";
+    } else {
+        turn = false;
+        mark = "O";
+        mark2="X";
+    }
+   }
+function put(inMessage)  {
+     var cell=document.getElementById(inMessage);
+
+    cell.innerHTML=mark2;
+}
 
 $(document).ready(function(){
     $('table#game td').click(function(e){
         var t = e.target || e.srcElement;
-    doSend("PLAYER"+mark+":"+ t.id);
+
        //получаем подтверждение хода
-        if(turn){t.innerHTML=mark;}
-
-
+        if(turn){
+            if(cell.innerHTML=="O"||cell.innerHTML=="X") {alert ("You can't put mark here!")}
+           else{
+            doSend("PLAYER:"+ t.id);
+            t.innerHTML=mark; turn=false;}
+        }
+        else alert("Wait for your turn");
     });
 });
 
-function gameOver(gameOver,won){
-    //получаем исход игры
-    if(gameOver){
-        if (won){alert("You won!");}//тут полученое условие на выграш
+function gameOver(inMessage){
+        if (won){alert("You won!");}
         else{alert("You've lost!");}
-    }
-
-
+         //вызывается предложение сиграть сново
 }
 //окно предложить играть сново
 $(function(){
@@ -156,22 +174,7 @@ $(function(){
     });
 })
 
-//это в последствии переделается под передачу данных поля
-function tableRowsToJSON() {
-    var outstr='[';
-    $('table#editable tr.rowdata').each(function() {
-        outstr+='{';
-        outstr+="ID:'"+$('td:nth-child(1)',this).text()+"',";
-        outstr+="First_Name:'"+$('td:nth-child(2)',this).text()+"',";
-        outstr+="Last_Name:'"+$('td:nth-child(3)',this).text()+"',";
-        outstr+="Age:'"+$('td:nth-child(4)',this).text()+"',";
-        outstr+="Phone:'"+$('td:nth-child(5)',this).text()+"'";
-        outstr+='},';
-    });
-    outstr=outstr+"]";
-    alert(outstr);
-    return outstr;
-}
+
 
 
 
