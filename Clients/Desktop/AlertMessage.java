@@ -97,8 +97,19 @@ JPanel but=new JPanel();
 		}
 
 	public void tryLeate() {
-		serverFail();
-		label1.setText("There is no players online. Please, wait.");
+		label1 = new JLabel(
+				"There is no players online. Please, wait.");
+		JButton button = new JButton("  Ok  ");
+
+		panel.add(label1);
+		panel.add(button);
+
+		button.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				client.getPlayers();
+				frame.dispose();
+			}
+		});
 		
 	}
 

@@ -6,10 +6,12 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.JFrame;
+import javax.swing.JPanel;
 
 public class GameView {
 	
 	private JFrame frame = new JFrame();
+	private JPanel panel=new JPanel();
 	private String mark; 
 	private String mark2;
 	private boolean turn; //право хода
@@ -18,6 +20,7 @@ public class GameView {
 	public GameView(String turnSign, Client_Desktop client) {
 	this.client=client;
 	
+	frame.add(panel);
 	System.out.println("Знак игры "+ turnSign);
 		if (turnSign == "cross") {
 			turn = true;
@@ -32,7 +35,7 @@ public class GameView {
 		frame.setSize(170, 170);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setVisible(true);
-		frame.setLayout(new GridLayout(3, 3));
+		panel.setLayout(new GridLayout(3, 3));
 
 		for (int i = 0; i < 3; i++) {
 			for (int j = 0; j < 3; j++) {
@@ -41,29 +44,30 @@ public class GameView {
 		}
 	}
 	
+	
 	public void put(String message) {
-		for(Component comp: frame.getComponents()){
-			if(comp.getClass()==GButton.class){
-				if (((GButton)comp).num == message){
+		for(Component comp: panel.getComponents()){
+			System.out.println(comp.getClass().getSimpleName());
+			if(comp.getClass().getSimpleName().equals("GButton")){
+					if (((GButton)comp).num.equals(message.trim())){
 					((GButton)comp).setText(mark2);
-					turn = true;
-				}
+					turn = true;}					
 			}
 		}
 	}
 
 	void addButton(String name) {
 		final GButton botton = new GButton(name);
-		frame.add(botton);
+		panel.add(botton);
 
 		botton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				System.out.println(turn);
 				if (turn) {
+					if (botton.getText().equals("")){
 					botton.setText(mark);
-					System.out.println(botton.num);
 					client.put(botton.num);
-					turn = false;
+					turn = false;}
+					else System.out.println("Клетка занята");
 				}
 				else new AlertMessage(client).weitForTurn();
 			}

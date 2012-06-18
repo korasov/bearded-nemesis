@@ -91,9 +91,9 @@ public class Client_Desktop implements Runnable {
 			case Command.PLAYERS:{ comm.getPlayers(message); break;}
 			case Command.OFFER:{ comm.offer(message); break;}
 			case Command.START:{ comm.initStart(message); break;}
-			case Command.STATUS:{ comm.status(message); break;}
+			case Command.LOST:{ comm.status(command); break;}
 			case Command.REJECTED:{ comm.rejected(message); break;}
-			case Command.PUT: {comm.put(message); break;}
+			case Command.PUT: {comm.put(message); System.out.println(message); break;}
 			default: { System.out.println("Неизвестная команда");break;}
 			
 			}
