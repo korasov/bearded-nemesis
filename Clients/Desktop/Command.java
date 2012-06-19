@@ -7,8 +7,7 @@ public class Command {
 	public static final int PLAYERS = 1;
 	public static final int OFFER = 2;
 	public static final int START = 3;
-	public static final int LOST = 4;
-	public static final int WON = 4;
+	public static final int STATUS = 4;
 	public static final int REJECTED = 5;
 	public static final int PUT = 6;
 	GameView game = null;
@@ -31,7 +30,7 @@ public class Command {
 		if (comName.equals("start")) {
 			type = 3;
 		}
-		if (comName.equals("win")||comName.equals("lose")) {
+		if (comName.equals("win")||comName.equals("lose")||comName.equals("drawn")) {
 			type = 4;
 		}
 		if (comName.equals("rejected")) {
@@ -73,8 +72,9 @@ public class Command {
 	public void status(String message) {
 		if (message.equals("win")) {
 			new AlertMessage(client).anotherGame(" won :).");
-		} else
+		} else if(message.equals("lost"))
 			new AlertMessage(client).anotherGame(" lost :(.");
+		else new AlertMessage(client).anotherGame(" played well.");
 	}
 
 	public void rejected(String message) {

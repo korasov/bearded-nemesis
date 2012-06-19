@@ -17,6 +17,7 @@ public class StartGame {
 
 	private StartGame() {
 
+	
 		frame.setSize(150, 150);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setVisible(true);
@@ -32,7 +33,7 @@ public class StartGame {
 		panel.add(label1);
 		panel.add(addItem);
 		panel.add(button);
-
+		panel.revalidate();
 					
 		button.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {

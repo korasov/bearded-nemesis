@@ -35,7 +35,8 @@ public class AlertMessage {
 
 		panel.add(label1);
 		panel.add(button);
-
+		panel.revalidate();
+		
 		button.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				new ChoiseView(client, Command.playerList);
@@ -57,17 +58,18 @@ JPanel but=new JPanel();
 		but.add(button2);
 		panel.add(but);
 		but.setLayout(new GridLayout());
+		panel.revalidate();
 		
 		button1.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-			client.sendMessage("OFFERRESPONSE: Yes");
+			client.sendMessage("NEXTGAME: Yes");
 				frame.dispose();
 			}
 		});
 
 		button2.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				client.sendMessage("OFFERRESPONSE: No");
+				client.sendMessage("NEXTGAME: No");
 				new ChoiseView(client, Command.playerList);
 				frame.dispose();
 			}
@@ -82,7 +84,8 @@ JPanel but=new JPanel();
 
 		panel.add(label1);
 		panel.add(button);
-
+		panel.revalidate();
+		
 		button.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				frame.dispose();
@@ -103,7 +106,8 @@ JPanel but=new JPanel();
 
 		panel.add(label1);
 		panel.add(button);
-
+		panel.revalidate();
+		
 		button.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				client.getPlayers();
@@ -114,7 +118,32 @@ JPanel but=new JPanel();
 	}
 
 	public void offergame(String opponent) {
-		anotherGame("");
+		label1 = new JLabel("Do you want to play with "+opponent+" ?");
+		JButton button1 = new JButton("  Yes  ");
+		JButton button2 = new JButton("  No  ");
+JPanel but=new JPanel();
+
+		panel.add(label1);
+		but.add(button1);
+		but.add(button2);
+		panel.add(but);
+		but.setLayout(new GridLayout());
+		panel.revalidate();
+		
+		button1.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+			client.sendMessage("OFFERRESPONSE: Yes");
+				frame.dispose();
+			}
+		});
+
+		button2.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				client.sendMessage("OFFERRESPONSE: No");
+				new ChoiseView(client, Command.playerList);
+				frame.dispose();
+			}
+		});
 		label1.setText("Do you want to play with "+opponent);
 		
 	}

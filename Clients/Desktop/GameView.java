@@ -42,6 +42,7 @@ public class GameView {
 				addButton(Integer.toString(i)+Integer.toString(j));
 			}
 		}
+		panel.revalidate();
 	}
 	
 	
