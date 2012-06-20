@@ -6,5 +6,7 @@
     <string name="enterserver">Server address:</string>
     <string name="enterplayer">Player name:</string>
     <string name="loginButtonLabel">Connect &amp; Login</string>
+    <string name="lobbycaption">Players online:</string>
+    <string name="refreshLobby">Refresh</string>
 
 </resources>
