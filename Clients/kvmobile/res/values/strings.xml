@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="enterport">Server port:</string>
+    <string name="app_name">KVmobile</string>
+    <string name="enterserver">Server address:</string>
+    <string name="enterplayer">Player name:</string>
+    <string name="loginButtonLabel">Connect &amp; Login</string>
+
+</resources>
