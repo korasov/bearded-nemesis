@@ -24,6 +24,8 @@ public class WebSocketPlayer extends Player implements WebSocket.OnTextMessage {
 
 	@Override
 	public void onClose(int closeCode, String closeMessage) {
+		System.out.println(this.name + " closed connection with code "
+				+ closeCode + " and message " + closeMessage);
 	}
 
 	@Override

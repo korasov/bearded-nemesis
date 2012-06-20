@@ -8,8 +8,8 @@ import java.net.Socket;
 
 public class SocketPlayer extends Player {
 
-	BufferedReader br = null;
-	PrintWriter pw = null;
+	private BufferedReader br = null;
+	private PrintWriter pw = null;
 
 	public SocketPlayer(Socket socket) throws IOException {
 		br = new BufferedReader(new InputStreamReader(

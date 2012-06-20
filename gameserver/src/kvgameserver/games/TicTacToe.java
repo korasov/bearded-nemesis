@@ -1,7 +1,6 @@
 package kvgameserver.games;
 
 import java.io.IOException;
-import java.util.Arrays;
 
 import kvgameserver.DataKeeper;
 import kvgameserver.players.Player;
@@ -69,7 +68,6 @@ public class TicTacToe implements Runnable {
 				playerTwo.send("DRAW");
 			}
 			afterGameCheck();
-			// TODO : return to lobby
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -142,7 +140,20 @@ public class TicTacToe implements Runnable {
 	}
 
 	private void playerMove(TTTPlayer from, TTTPlayer to) throws IOException {
-		String message = from.receive();
+		String message = null;
+		boolean read = false;
+		while (!read) {
+			try {
+				Thread.sleep(10);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+			if (from.hasIncoming()) {
+				message = from.receive();
+				read = true;
+			}
+		}
+		System.out.println(message);
 		String[] messageParts = message.split(":");
 		// TODO : should be a check for "put" command
 		String attrs = messageParts[1].trim();
@@ -176,7 +187,10 @@ public class TicTacToe implements Runnable {
 			return player.receive();
 		}
 
-		@SuppressWarnings("unused")
+		public boolean hasIncoming() throws IOException {
+			return player.hasIncoming();
+		}
+
 		public Player getPlayer() {
 			return this.player;
 		}
