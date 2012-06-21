@@ -1,7 +1,11 @@
 package kv.mobile;
 
+import kv.mobile.events.EventCreator;
+import kv.mobile.events.EventManager;
+import kv.mobile.protocols.SimpleLobbyComm;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -39,6 +43,16 @@ public class KVmobileActivity extends Activity {
 				    dlgAlert.setCancelable(true);
 				    dlgAlert.create().show();
 				}
+				FlightControl.evMan = new EventManager();
+				Thread evManThread = new Thread(FlightControl.evMan);
+				evManThread.start();
+				Thread evCreatorThread = new Thread(new EventCreator(
+						new SimpleLobbyComm(), FlightControl.evMan));
+				evCreatorThread.start();
+				Intent intent = new Intent(KVmobileActivity.this,
+						LobbyActivity.class);
+				startActivity(intent);
+				
 			}
         	
         });

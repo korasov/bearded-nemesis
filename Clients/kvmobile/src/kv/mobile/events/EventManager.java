@@ -3,47 +3,52 @@ package kv.mobile.events;
 import java.util.ArrayList;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-import kv.mobile.events.lobbyevents.LobbyEvent;
+import android.util.Log;
 
 public class EventManager implements Runnable {
 
-	private ConcurrentLinkedQueue<Event> eventQueue = 
-			new ConcurrentLinkedQueue<Event>();
-	private ArrayList<LobbySubscriber> lobbySubscribers =
-			new ArrayList<LobbySubscriber>();
+	private ConcurrentLinkedQueue<String> messageQueue =
+			new ConcurrentLinkedQueue<String>();
+	private ArrayList<Subscriber> subscribers = new ArrayList<Subscriber>();
 
 	public void subscribe(Subscriber newOne) {
-		if (newOne instanceof LobbySubscriber) {
-			lobbySubscribers.add((LobbySubscriber) newOne);
+		Log.d("evMan", "Adding new subscriber" + newOne);
+		synchronized(subscribers) {
+			Log.d("evMan", "Now in synchronized section");
+			subscribers.add(newOne);
 		}
 	}
 
 	public void unsubscribe(Subscriber oldOne) {
-		if (oldOne instanceof LobbySubscriber) {
-			lobbySubscribers.remove(oldOne);
+		synchronized(subscribers) {
+			subscribers.remove(oldOne);
 		}
-	}
-
-	public void addEvent(Event e) {
-		eventQueue.add(e);
 	}
 
 	@Override
 	public void run() {
-		while(true) {
+		Log.d("evMan", "Running evMan thread");
+		while (true) {
 			try {
-				// first we get some sleep
 				Thread.sleep(20);
 			} catch (InterruptedException e) {
 			}
-			while (!eventQueue.isEmpty()) {
-				Event event = eventQueue.poll();
-				if (event instanceof LobbyEvent) {
-					for (LobbySubscriber subs : lobbySubscribers) {
-						subs.operate(event);
+			while (!messageQueue.isEmpty()) {
+				String message = messageQueue.poll();
+				Log.d("evMan", "Sending message " + message
+						+ " to all subcribers");
+				synchronized(subscribers) {
+					for (Subscriber subscriber : subscribers) {
+						Log.d("evMan", "Calling all girls: " + subscriber);
+						subscriber.process(message);
 					}
 				}
 			}
 		}
+	}
+
+	public void addMessage(String message) {
+		Log.d("evMan", "Adding message " + message + " to queue");
+		messageQueue.add(message);
 	}
 }

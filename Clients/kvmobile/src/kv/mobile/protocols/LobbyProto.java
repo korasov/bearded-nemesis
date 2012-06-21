@@ -1,7 +1,9 @@
 package kv.mobile.protocols;
 
-public interface LobbyProtocolSender {
+public interface LobbyProto {
+
 	public void players();
 	public void opponent(String name);
-	public void offerresponse(boolean accept);
+	public void offerResponse(boolean accepted);
+
 }

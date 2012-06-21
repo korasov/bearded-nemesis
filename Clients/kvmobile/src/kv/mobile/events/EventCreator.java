@@ -1,11 +1,15 @@
 package kv.mobile.events;
 
-import kv.mobile.protocols.ProtocolReceiver;
+import kv.mobile.protocols.Receiver;
 
 public class EventCreator implements Runnable {
 
-	public EventCreator(ProtocolReceiver pr) {
-		this.pr = pr;
+	private Receiver receiver = null;
+	private EventManager manager = null;
+
+	public EventCreator(Receiver receiver, EventManager manager) {
+		this.receiver = receiver;
+		this.manager = manager;
 	}
 	@Override
 	public void run() {
@@ -13,9 +17,10 @@ public class EventCreator implements Runnable {
 			try {
 				Thread.sleep(20);
 			} catch (InterruptedException e) {
-				e.printStackTrace();
 			}
-			
+			if (receiver.ready()) {
+				manager.addMessage(receiver.receive());
+			}
 		}
 	}
 
