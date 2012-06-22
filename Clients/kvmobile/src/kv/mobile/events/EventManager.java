@@ -12,9 +12,7 @@ public class EventManager implements Runnable {
 	private ArrayList<Subscriber> subscribers = new ArrayList<Subscriber>();
 
 	public void subscribe(Subscriber newOne) {
-		Log.d("evMan", "Adding new subscriber" + newOne);
 		synchronized(subscribers) {
-			Log.d("evMan", "Now in synchronized section");
 			subscribers.add(newOne);
 		}
 	}
@@ -27,7 +25,6 @@ public class EventManager implements Runnable {
 
 	@Override
 	public void run() {
-		Log.d("evMan", "Running evMan thread");
 		while (true) {
 			try {
 				Thread.sleep(20);
@@ -35,11 +32,8 @@ public class EventManager implements Runnable {
 			}
 			while (!messageQueue.isEmpty()) {
 				String message = messageQueue.poll();
-				Log.d("evMan", "Sending message " + message
-						+ " to all subcribers");
 				synchronized(subscribers) {
 					for (Subscriber subscriber : subscribers) {
-						Log.d("evMan", "Calling all girls: " + subscriber);
 						subscriber.process(message);
 					}
 				}
@@ -48,7 +42,6 @@ public class EventManager implements Runnable {
 	}
 
 	public void addMessage(String message) {
-		Log.d("evMan", "Adding message " + message + " to queue");
 		messageQueue.add(message);
 	}
 }

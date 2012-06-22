@@ -13,22 +13,32 @@
         android:layout_alignParentTop="true"
         android:text="@string/lobbycaption"
         android:textAppearance="?android:attr/textAppearanceLarge" />
-
+
+    <ListView
+        android:id="@+id/playerList"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/diconnectButton"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentRight="true"
+        android:layout_below="@+id/lobbyCaption" >
+
+    </ListView>
+
+    <Button
+        android:id="@+id/diconnectButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:text="@string/disconnect" />
+
     <Button
         android:id="@+id/refreshLobby"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_alignParentLeft="true"
-        android:layout_alignParentRight="true"
         android:text="@string/refreshLobby" />
-
-    <ListView
-        android:id="@+id/playerList"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_below="@+id/lobbyCaption" android:layout_alignParentRight="true">
-    </ListView>
 
 </RelativeLayout>

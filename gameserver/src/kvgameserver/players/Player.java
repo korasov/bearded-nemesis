@@ -10,4 +10,5 @@ public abstract class Player {
 	public abstract void send(String message) throws IOException;
 	public abstract String receive() throws IOException;
 	public abstract boolean hasIncoming() throws IOException;
+	public abstract boolean connected();
 }

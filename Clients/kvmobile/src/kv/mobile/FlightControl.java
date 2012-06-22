@@ -6,6 +6,8 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
 
+import android.util.Log;
+
 import kv.mobile.events.EventManager;
 import kv.mobile.protocols.LobbyProto;
 
@@ -34,5 +36,15 @@ public class FlightControl {
 
 	public static String receive() throws IOException {
 		return br.readLine();
+	}
+
+	public static void disconnect() {
+		try {
+			br.close();
+			pw.close();
+			connection.close();
+		} catch (IOException e) {
+			Log.d("FC", "Error closing socket");
+		}
 	}
 }

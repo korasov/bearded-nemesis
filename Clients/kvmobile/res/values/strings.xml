@@ -8,5 +8,6 @@
     <string name="loginButtonLabel">Connect &amp; Login</string>
     <string name="lobbycaption">Players online:</string>
     <string name="refreshLobby">Refresh</string>
+    <string name="disconnect">Disconnect</string>
 
 </resources>

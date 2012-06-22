@@ -10,8 +10,10 @@ public class SocketPlayer extends Player {
 
 	private BufferedReader br = null;
 	private PrintWriter pw = null;
+	private Socket socket = null;
 
 	public SocketPlayer(Socket socket) throws IOException {
+		this.socket = socket;
 		br = new BufferedReader(new InputStreamReader(
 				socket.getInputStream()));
 		pw = new PrintWriter(socket.getOutputStream(), true);
@@ -31,5 +33,10 @@ public class SocketPlayer extends Player {
 	@Override
 	public boolean hasIncoming() throws IOException {
 		return br.ready();
+	}
+
+	@Override
+	public boolean connected() {
+		return !socket.isClosed();
 	}
 }

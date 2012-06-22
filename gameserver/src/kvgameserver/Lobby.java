@@ -29,6 +29,11 @@ public class Lobby implements Runnable {
 				Player player = players.nextElement();
 				try {
 					Thread.sleep(pause);
+					boolean connected = player.connected();
+					if (!connected) {
+						DataKeeper.lobby.remove(player.name);
+						continue;
+					}
 					boolean playerReady = player.hasIncoming();
 					if (!playerReady) {
 						continue;

@@ -45,4 +45,9 @@ public class WebSocketPlayer extends Player implements WebSocket.OnTextMessage {
 		return !messages.isEmpty();
 	}
 
+	@Override
+	public boolean connected() {
+		return connection.isOpen();
+	}
+
 }
